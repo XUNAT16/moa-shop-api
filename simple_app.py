@@ -156,12 +156,24 @@ def search():
     # Handle both GET and POST
     if request.method == 'POST':
         data = request.get_json() or {}
-        shop_query = data.get('shop', data.get('name', '')).lower().strip()
+        # Try multiple possible field names that chatbots might use
+        shop_query = (data.get('shop') or 
+                     data.get('name') or 
+                     data.get('query') or 
+                     data.get('text') or 
+                     data.get('message') or 
+                     data.get('user_input') or '').lower().strip()
     else:
-        shop_query = request.args.get('shop', request.args.get('name', '')).lower().strip()
+        shop_query = (request.args.get('shop') or 
+                     request.args.get('name') or 
+                     request.args.get('query') or '').lower().strip()
     
     if not shop_query:
-        return jsonify({"error": "Please provide a shop name"}), 400
+        return jsonify({
+            "error": "Please provide a shop name",
+            "received_data": request.get_json() if request.method == 'POST' else dict(request.args),
+            "hint": "Send JSON with 'shop', 'name', 'query', 'text', 'message', or 'user_input' field"
+        }), 400
     
     # Search for shop
     if shop_query in SHOPS:
@@ -249,6 +261,50 @@ def get_popular():
         "count": len(shops_list),
         "message": message
     }), 200
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    """Flexible webhook that accepts any JSON structure and tries to find the shop name"""
+    data = request.get_json() or {}
+    
+    # Try to extract shop name from various possible structures
+    shop_query = ''
+    
+    # Try common field names
+    for field in ['shop', 'name', 'query', 'text', 'message', 'user_input', 'user_message', 'content']:
+        if field in data and data[field]:
+            shop_query = str(data[field]).lower().strip()
+            break
+    
+    # If still no shop_query, try to find it in nested structures
+    if not shop_query and 'message' in data and isinstance(data['message'], dict):
+        shop_query = str(data['message'].get('text', '')).lower().strip()
+    
+    # Log what we received for debugging
+    if not shop_query:
+        return jsonify({
+            "error": "Could not find shop name in request",
+            "received_data": data,
+            "hint": "Please send JSON with one of these fields: shop, name, query, text, message, user_input"
+        }), 400
+    
+    # Search for shop
+    if shop_query in SHOPS:
+        shop = SHOPS[shop_query]
+        message = f"🛍️ *{shop['name']}*\n\n📍 *Location:*\n{shop['location']}\n\n🏷️ *Category:* {shop['category']}"
+        
+        return jsonify({
+            "found": True,
+            "shop": shop,
+            "message": message,
+            "text": message  # Some chatbots look for 'text' field
+        }), 200
+    
+    return jsonify({
+        "found": False,
+        "message": f"Sorry, I couldn't find '{shop_query}' in SM Mall of Asia. Try: uniqlo, h&m, muji, shake shack, starbucks",
+        "text": f"Sorry, I couldn't find '{shop_query}' in SM Mall of Asia. Try: uniqlo, h&m, muji, shake shack, starbucks"
+    }), 404
 
 if __name__ == '__main__':
     import os
