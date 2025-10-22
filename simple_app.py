@@ -431,11 +431,13 @@ def traffic_info():
                 "🅿️ *SM MOA Parking Rates:*\n\n"
                 "🕐 *Hourly Rate:* ₱40 per hour\n"
                 "📅 *Daily Max:* ₱200\n"
-                "🌙 *Overnight:* ₱300\n\n"
+                "🌙 *Overnight:* ₱300\n"
+                "⚠️ *Additional:* +₱50 if exiting after 6:01 AM\n\n"
                 "💡 *Tips:*\n"
                 "• Pay at exit lanes or parking payment booths\n"
                 "• Cash and card accepted\n"
-                "• Keep your parking ticket safe!"
+                "• Keep your parking ticket safe!\n"
+                "• Use SM Car Park App to check availability"
             )
         }
     
@@ -445,20 +447,23 @@ def traffic_info():
             "found": True,
             "type": "parking_locations",
             "message": (
-                "🅿️ *SM MOA Parking Locations:*\n\n"
-                "1️⃣ *North Parking* (Main Mall)\n"
-                "   📍 Near North Entertainment Mall\n"
-                "   🚗 Multi-level parking building\n\n"
-                "2️⃣ *South Parking* (Main Mall)\n"
-                "   📍 Near South Wing entrance\n"
-                "   🚗 Covered parking area\n\n"
-                "3️⃣ *Entertainment Mall Parking*\n"
-                "   📍 Near MOA Arena & IMAX\n"
-                "   🚗 Large open parking lot\n\n"
-                "4️⃣ *Seaside Parking*\n"
-                "   📍 Near By the Bay area\n"
-                "   🌊 Great for bay view visits\n\n"
-                "💡 Tip: South & North parking are closest to main shops!"
+                "🅿️ *SM MOA Parking Facilities:*\n\n"
+                "1️⃣ *Main Mall* (~8,000 slots)\n"
+                "   📍 North & South Parking Buildings\n"
+                "   🌙 Overnight parking available\n\n"
+                "2️⃣ *MOA Arena (MAAX)* (1,400 slots)\n"
+                "   📍 Adjacent to the Arena\n"
+                "   🎫 Event parking available\n\n"
+                "3️⃣ *NU Mall of Asia (NUMA)* (720 slots)\n"
+                "   📍 Near the Arena\n"
+                "   🏢 Office & retail parking\n\n"
+                "4️⃣ *IKEA MOA Square* (200 slots)\n"
+                "   � Adjacent to IKEA store\n"
+                "   🛒 Shopping parking\n\n"
+                "5️⃣ *SMX Convention Center* (400 slots)\n"
+                "   📍 Basement parking area\n"
+                "   📊 Convention & event parking\n\n"
+                "� *Use SM Car Park App* to find open slots!"
             )
         }
     
@@ -491,19 +496,25 @@ def traffic_info():
             "found": True,
             "type": "traffic_tips",
             "message": (
-                "🚦 *SM MOA Traffic & Peak Hours:*\n\n"
-                "⏰ *Peak Traffic Times:*\n"
-                "• Morning: 7:00 AM - 9:00 AM\n"
-                "• Evening: 5:00 PM - 8:00 PM\n"
-                "• Weekends: 11:00 AM - 9:00 PM\n\n"
+                "🚦 *SM MOA Traffic Conditions:*\n\n"
+                "📊 *Traffic Severity:*\n"
+                "• Manila ranks among world's most congested cities\n"
+                "• Peak congestion often exceeds 60%\n\n"
+                "⏰ *Worst Traffic Times:*\n"
+                "• Weekends & holidays (all day)\n"
+                "• During MOA Arena or SMX events\n"
+                "• Rush hours: 7-9 AM, 5-8 PM\n\n"
+                "🛣️ *Main Roads:*\n"
+                "• *Macapagal Boulevard* (8-lane road)\n"
+                "• *Jose W. Diokno Boulevard* (4.38 km)\n"
+                "• Both run parallel to MOA complex\n\n"
                 "✅ *Best Times to Visit:*\n"
                 "• Weekdays: 10:00 AM - 4:00 PM\n"
-                "• Early morning: Before 10:00 AM\n"
-                "• Late evening: After 9:00 PM\n\n"
-                "💡 *Tips:*\n"
-                "• Avoid Friday/Saturday nights (very crowded)\n"
-                "• Use Waze/Google Maps for real-time traffic\n"
-                "• Consider taking MRT to avoid parking hassle"
+                "• Early mornings before 10:00 AM\n\n"
+                "📱 *Real-Time Traffic Apps:*\n"
+                "• Waze (live updates & routing)\n"
+                "• Google Maps (traffic conditions)\n"
+                "• SM Car Park App (parking availability)"
             )
         }
     
