@@ -80,6 +80,61 @@ SHOPS = {
         "name": "Timezone",
         "location": "Main Mall, Upper Ground Level – Entertainment Area",
         "category": "Entertainment / Gaming"
+    },
+    "the sm store": {
+        "name": "The SM Store - SM Mall of Asia",
+        "category": "Department Store",
+        "location": "Main Mall, Ground Level – Center Atrium"
+    },
+    "power mac": {
+        "name": "Power Mac Center - SM Mall of Asia",
+        "category": "Electronics",
+        "location": "Cyberzone, Level 2 – North Wing"
+    },
+    "beyond the box": {
+        "name": "Beyond the Box - SM Mall of Asia",
+        "category": "Electronics / Apple Reseller",
+        "location": "Cyberzone, Level 2 – North Wing"
+    },
+    "muji cafe": {
+        "name": "Muji Coffee - SM Mall of Asia",
+        "category": "Café",
+        "location": "South Wing, Level 3 – inside MUJI store"
+    },
+    "mary grace": {
+        "name": "Café Mary Grace - SM Mall of Asia",
+        "category": "Café / Bakery",
+        "location": "Ground Floor, Main Mall – near The SM Store entrance"
+    },
+    "tim ho wan": {
+        "name": "Tim Ho Wan - SM Mall of Asia",
+        "category": "Chinese / Dim Sum Restaurant",
+        "location": "Ground Floor, Main Mall – South Wing, near Uniqlo"
+    },
+    "ramen nagi": {
+        "name": "Ramen Nagi - SM Mall of Asia",
+        "category": "Japanese Restaurant",
+        "location": "Ground Floor, Main Mall – South Wing, near H&M"
+    },
+    "conti's": {
+        "name": "Conti's Bakeshop and Restaurant - SM Mall of Asia",
+        "category": "Bakery / Restaurant",
+        "location": "Ground Floor, South Wing – near IMAX"
+    },
+    "imax": {
+        "name": "IMAX Theatre - SM Mall of Asia",
+        "category": "Entertainment / Cinema",
+        "location": "South Wing – SM Cinema Complex, near Parking Building"
+    },
+    "moa arena": {
+        "name": "Mall of Asia Arena",
+        "category": "Events / Concert Venue",
+        "location": "Across MOA Main Mall, Seaside Blvd."
+    },
+    "smx": {
+        "name": "SMX Convention Center Manila",
+        "category": "Convention Center",
+        "location": "MOA Complex, beside Conrad Manila"
     }
 }
 
