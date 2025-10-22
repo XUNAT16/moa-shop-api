@@ -262,6 +262,114 @@ def get_popular():
         "message": message
     }), 200
 
+@app.route('/query', methods=['GET', 'POST'])
+def unified_query():
+    """Unified endpoint that handles shop search, category browse, and popular picks"""
+    
+    # Extract parameters
+    if request.method == 'POST':
+        data = request.get_json() or {}
+        query_type = data.get('type', '').lower()
+        query_value = data.get('value', '').lower().strip()
+    else:
+        query_type = request.args.get('type', '').lower()
+        query_value = request.args.get('value', '').lower().strip()
+    
+    # Handle Popular Picks (no value needed)
+    if query_type == 'popular':
+        popular_shops = ["uniqlo", "h&m", "shake shack", "starbucks", "muji", "jollibee"]
+        shops_list = []
+        message = "⭐ *Popular Shops at SM Mall of Asia:*\n\n"
+        
+        for i, shop_key in enumerate(popular_shops, 1):
+            if shop_key in SHOPS:
+                shop = SHOPS[shop_key]
+                shops_list.append(shop)
+                message += f"{i}. *{shop['name']}*\n   📍 {shop['location']}\n   🏷️ {shop['category']}\n\n"
+        
+        return jsonify({
+            "found": True,
+            "type": "popular",
+            "count": len(shops_list),
+            "shops": shops_list,
+            "message": message
+        }), 200
+    
+    # Handle Category Browse
+    elif query_type == 'category':
+        if not query_value:
+            # Return list of categories
+            categories = set(shop['category'] for shop in SHOPS.values())
+            categories_list = sorted(list(categories))
+            message = "📂 *Shop Categories at SM Mall of Asia:*\n\n"
+            for i, cat in enumerate(categories_list, 1):
+                message += f"{i}. {cat}\n"
+            
+            return jsonify({
+                "found": True,
+                "type": "categories",
+                "categories": categories_list,
+                "message": message
+            }), 200
+        else:
+            # Search by category
+            matching_shops = []
+            for shop_key, shop_data in SHOPS.items():
+                if query_value in shop_data['category'].lower():
+                    matching_shops.append(shop_data)
+            
+            if matching_shops:
+                message = f"🏪 *{query_value.title()}* shops:\n\n"
+                for shop in matching_shops:
+                    message += f"• *{shop['name']}*\n  📍 {shop['location']}\n\n"
+                
+                return jsonify({
+                    "found": True,
+                    "type": "category",
+                    "category": query_value,
+                    "count": len(matching_shops),
+                    "shops": matching_shops,
+                    "message": message
+                }), 200
+            else:
+                return jsonify({
+                    "found": False,
+                    "type": "category",
+                    "message": f"No shops found in category '{query_value}'"
+                }), 404
+    
+    # Handle Shop Search (default)
+    elif query_type == 'shop' or query_type == '':
+        if not query_value:
+            return jsonify({
+                "error": "Please provide a shop name in 'value' field",
+                "hint": "Use type=shop&value=uniqlo or type=category&value=food or type=popular"
+            }), 400
+        
+        # Search for shop
+        if query_value in SHOPS:
+            shop = SHOPS[query_value]
+            message = f"🛍️ *{shop['name']}*\n\n📍 *Location:*\n{shop['location']}\n\n🏷️ *Category:* {shop['category']}"
+            
+            return jsonify({
+                "found": True,
+                "type": "shop",
+                "shop": shop,
+                "message": message
+            }), 200
+        else:
+            return jsonify({
+                "found": False,
+                "type": "shop",
+                "message": f"Sorry, I couldn't find '{query_value}' in SM Mall of Asia. Try: uniqlo, h&m, muji, shake shack, starbucks"
+            }), 404
+    
+    else:
+        return jsonify({
+            "error": "Invalid query type",
+            "hint": "Use type=shop, type=category, or type=popular"
+        }), 400
+
 @app.route('/webhook', methods=['POST'])
 def webhook():
     """Flexible webhook that accepts any JSON structure and tries to find the shop name"""
