@@ -155,7 +155,7 @@ def home():
 def search():
     # Handle both GET and POST
     if request.method == 'POST':
-        data = request.get_json() or {}
+        data = request.get_json(force=True, silent=True) or {}
         # Try multiple possible field names that chatbots might use
         shop_query = (data.get('shop') or 
                      data.get('name') or 
@@ -171,7 +171,7 @@ def search():
     if not shop_query:
         return jsonify({
             "error": "Please provide a shop name",
-            "received_data": request.get_json() if request.method == 'POST' else dict(request.args),
+            "received_data": request.get_json(force=True, silent=True) if request.method == 'POST' else dict(request.args),
             "hint": "Send JSON with 'shop', 'name', 'query', 'text', 'message', or 'user_input' field"
         }), 400
     
@@ -210,7 +210,7 @@ def get_categories():
 def get_category_shops():
     """Get shops by category"""
     if request.method == 'POST':
-        data = request.get_json() or {}
+        data = request.get_json(force=True, silent=True) or {}
         category = data.get('category', data.get('name', '')).strip()
     else:
         category = request.args.get('category', request.args.get('name', '')).strip()
@@ -268,7 +268,7 @@ def unified_query():
     
     # Extract parameters
     if request.method == 'POST':
-        data = request.get_json() or {}
+        data = request.get_json(force=True, silent=True) or {}
         query_type = data.get('type', '').lower()
         query_value = data.get('value', '').lower().strip()
     else:
@@ -373,7 +373,7 @@ def unified_query():
 @app.route('/webhook', methods=['POST'])
 def webhook():
     """Flexible webhook that accepts any JSON structure and tries to find the shop name"""
-    data = request.get_json() or {}
+    data = request.get_json(force=True, silent=True) or {}
     
     # Try to extract shop name from various possible structures
     shop_query = ''
@@ -418,7 +418,8 @@ def webhook():
 @app.route('/traffic', methods=['GET', 'POST'])
 def traffic_info():
     """Handle traffic and parking information queries"""
-    data = request.get_json() or {}
+    # Force JSON parsing even if Content-Type header is missing
+    data = request.get_json(force=True, silent=True) or {}
     query = data.get('query', '').lower().strip()
     category = data.get('category', '').lower().strip()
     
