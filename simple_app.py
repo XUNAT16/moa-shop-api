@@ -242,7 +242,7 @@ def get_category_shops():
         "message": f"No shops found in category '{category}'"
     }), 404
 
-@app.route('/popular', methods=['GET'])
+@app.route('/popular', methods=['GET', 'POST'])
 def get_popular():
     """Get popular/featured shops"""
     popular_shops = ["uniqlo", "h&m", "shake shack", "starbucks", "muji", "jollibee"]
@@ -413,6 +413,208 @@ def webhook():
         "message": f"Sorry, I couldn't find '{shop_query}' in SM Mall of Asia. Try: uniqlo, h&m, muji, shake shack, starbucks",
         "text": f"Sorry, I couldn't find '{shop_query}' in SM Mall of Asia. Try: uniqlo, h&m, muji, shake shack, starbucks"
     }), 404
+
+# Traffic & Parking Information Endpoint
+@app.route('/traffic', methods=['GET', 'POST'])
+def traffic_info():
+    """Handle traffic and parking information queries"""
+    data = request.get_json() or {}
+    query = data.get('query', '').lower().strip()
+    category = data.get('category', '').lower().strip()
+    
+    # Helper function for parking rates
+    def get_parking_rates():
+        return {
+            "found": True,
+            "type": "parking_rates",
+            "message": (
+                "🅿️ *SM MOA Parking Rates:*\n\n"
+                "🕐 *Hourly Rate:* ₱40 per hour\n"
+                "📅 *Daily Max:* ₱200\n"
+                "🌙 *Overnight:* ₱300\n\n"
+                "💡 *Tips:*\n"
+                "• Pay at exit lanes or parking payment booths\n"
+                "• Cash and card accepted\n"
+                "• Keep your parking ticket safe!"
+            )
+        }
+    
+    # Helper function for parking locations
+    def get_parking_locations():
+        return {
+            "found": True,
+            "type": "parking_locations",
+            "message": (
+                "🅿️ *SM MOA Parking Locations:*\n\n"
+                "1️⃣ *North Parking* (Main Mall)\n"
+                "   📍 Near North Entertainment Mall\n"
+                "   🚗 Multi-level parking building\n\n"
+                "2️⃣ *South Parking* (Main Mall)\n"
+                "   📍 Near South Wing entrance\n"
+                "   🚗 Covered parking area\n\n"
+                "3️⃣ *Entertainment Mall Parking*\n"
+                "   📍 Near MOA Arena & IMAX\n"
+                "   🚗 Large open parking lot\n\n"
+                "4️⃣ *Seaside Parking*\n"
+                "   📍 Near By the Bay area\n"
+                "   🌊 Great for bay view visits\n\n"
+                "💡 Tip: South & North parking are closest to main shops!"
+            )
+        }
+    
+    # Helper function for public transport
+    def get_public_transport():
+        return {
+            "found": True,
+            "type": "public_transport",
+            "message": (
+                "🚇 *How to Get to SM MOA:*\n\n"
+                "🚆 *MRT/LRT:*\n"
+                "• Take MRT-3 or LRT-1 to *Taft Avenue Station*\n"
+                "• Exit and take a jeepney or UV Express to MOA\n"
+                "• Travel time: ~10-15 minutes\n\n"
+                "🚌 *Bus Routes:*\n"
+                "• EDSA Carousel (free): Monumento to MOA\n"
+                "• Regular buses: Routes via EDSA-Taft\n\n"
+                "🚕 *Taxi/Grab:*\n"
+                "• Available 24/7\n"
+                "• From Taft: ₱80-120\n\n"
+                "🚶 *From Taft Station:*\n"
+                "• Jeepney: ₱15-20\n"
+                "• UV Express: ₱25-30"
+            )
+        }
+    
+    # Helper function for traffic tips
+    def get_traffic_tips():
+        return {
+            "found": True,
+            "type": "traffic_tips",
+            "message": (
+                "🚦 *SM MOA Traffic & Peak Hours:*\n\n"
+                "⏰ *Peak Traffic Times:*\n"
+                "• Morning: 7:00 AM - 9:00 AM\n"
+                "• Evening: 5:00 PM - 8:00 PM\n"
+                "• Weekends: 11:00 AM - 9:00 PM\n\n"
+                "✅ *Best Times to Visit:*\n"
+                "• Weekdays: 10:00 AM - 4:00 PM\n"
+                "• Early morning: Before 10:00 AM\n"
+                "• Late evening: After 9:00 PM\n\n"
+                "💡 *Tips:*\n"
+                "• Avoid Friday/Saturday nights (very crowded)\n"
+                "• Use Waze/Google Maps for real-time traffic\n"
+                "• Consider taking MRT to avoid parking hassle"
+            )
+        }
+    
+    # Helper function for walking directions
+    def get_walking_directions():
+        return {
+            "found": True,
+            "type": "walking_directions",
+            "message": (
+                "🚶 *Walking to SM MOA:*\n\n"
+                "📍 *From Nearby Areas:*\n\n"
+                "🏨 *From Conrad/Sheraton Hotels:*\n"
+                "• 5-10 minute walk along Seaside Boulevard\n"
+                "• Air-conditioned skybridge available\n\n"
+                "🏢 *From Bay Area/MOA Arena:*\n"
+                "• 10-15 minute walk to Main Mall\n"
+                "• Follow the baywalk path\n\n"
+                "🚉 *From Nearby Bus Stops:*\n"
+                "• EDSA Carousel stop: 5 min walk\n"
+                "• Regular bus stops: 2-5 min walk\n\n"
+                "💡 Tip: The mall is huge! Use mall directories to find shops."
+            )
+        }
+    
+    # Helper function for help/default message
+    def get_help_message():
+        return {
+            "found": False,
+            "type": "help",
+            "message": (
+                "🤔 I'm not sure about that.\n\n"
+                "I can help you with:\n\n"
+                "🅿️ *Parking*\n"
+                "   • Rates & pricing\n"
+                "   • Parking locations\n\n"
+                "🚇 *Public Transport*\n"
+                "   • MRT/LRT directions\n"
+                "   • Bus routes\n\n"
+                "🚦 *Traffic Info*\n"
+                "   • Peak hours\n"
+                "   • Best times to visit\n\n"
+                "🚶 *Walking Directions*\n"
+                "   • From nearby areas\n\n"
+                "What would you like to know?"
+            )
+        }
+    
+    # Category-based routing (for menu selection in Todook)
+    if category:
+        if category == 'parking_rates':
+            return jsonify(get_parking_rates()), 200
+        elif category == 'parking_locations':
+            return jsonify(get_parking_locations()), 200
+        elif category == 'public_transport':
+            return jsonify(get_public_transport()), 200
+        elif category == 'traffic_tips' or category == 'peak_hours':
+            return jsonify(get_traffic_tips()), 200
+        elif category == 'walking_directions':
+            return jsonify(get_walking_directions()), 200
+        else:
+            return jsonify(get_help_message()), 200
+    
+    # Query-based routing (for free-text questions)
+    if query:
+        # Parking-related queries
+        if 'park' in query:
+            if any(word in query for word in ['rate', 'price', 'cost', 'how much', 'fee', 'charge']):
+                return jsonify(get_parking_rates()), 200
+            elif any(word in query for word in ['where', 'location', 'find', 'area', 'building']):
+                return jsonify(get_parking_locations()), 200
+            else:
+                # General parking query - show both
+                rates = get_parking_rates()
+                locations = get_parking_locations()
+                return jsonify({
+                    "found": True,
+                    "type": "parking",
+                    "message": rates["message"] + "\n\n" + locations["message"]
+                }), 200
+        
+        # Public transport queries
+        elif any(word in query for word in ['mrt', 'lrt', 'train', 'metro', 'subway', 'bus', 'transport', 'commute']):
+            return jsonify(get_public_transport()), 200
+        
+        # Traffic/timing queries
+        elif any(word in query for word in ['traffic', 'rush', 'peak', 'busy', 'crowded', 'when', 'time']):
+            return jsonify(get_traffic_tips()), 200
+        
+        # Walking/directions queries
+        elif any(word in query for word in ['walk', 'direction', 'how to get', 'how do i get', 'route']):
+            if any(word in query for word in ['mrt', 'lrt', 'train', 'bus']):
+                return jsonify(get_public_transport()), 200
+            else:
+                return jsonify(get_walking_directions()), 200
+        
+        # Related words - suggest correct topic
+        elif any(word in query for word in ['car', 'vehicle', 'auto', 'drive']):
+            rates = get_parking_rates()
+            return jsonify({
+                "found": True,
+                "type": "parking",
+                "message": "💡 Did you mean *parking*?\n\n" + rates["message"]
+            }), 200
+        
+        # Default fallback
+        else:
+            return jsonify(get_help_message()), 200
+    
+    # No query or category provided - show help
+    else:
+        return jsonify(get_help_message()), 200
 
 if __name__ == '__main__':
     import os
