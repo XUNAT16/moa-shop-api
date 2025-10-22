@@ -89,7 +89,10 @@ def home():
         "status": "online",
         "message": "SM Mall of Asia Shop Directory API",
         "endpoints": {
-            "search": "/search?shop=uniqlo"
+            "search": "/search?shop=uniqlo",
+            "categories": "/categories",
+            "category_shops": "/category?name=Food & Dining",
+            "popular": "/popular"
         }
     })
 
@@ -120,6 +123,77 @@ def search():
         "found": False,
         "message": f"Sorry, I couldn't find '{shop_query}' in SM Mall of Asia. Try: uniqlo, h&m, muji, shake shack, starbucks"
     }), 404
+
+@app.route('/categories', methods=['GET'])
+def get_categories():
+    """Get all unique categories"""
+    categories = set(shop['category'] for shop in SHOPS.values())
+    categories_list = sorted(list(categories))
+    
+    message = "📂 *Shop Categories at SM Mall of Asia:*\n\n"
+    for i, cat in enumerate(categories_list, 1):
+        message += f"{i}. {cat}\n"
+    
+    return jsonify({
+        "categories": categories_list,
+        "message": message
+    }), 200
+
+@app.route('/category', methods=['GET', 'POST'])
+def get_category_shops():
+    """Get shops by category"""
+    if request.method == 'POST':
+        data = request.get_json() or {}
+        category = data.get('category', data.get('name', '')).strip()
+    else:
+        category = request.args.get('category', request.args.get('name', '')).strip()
+    
+    if not category:
+        return jsonify({"error": "Please provide a category name"}), 400
+    
+    # Find shops in this category (case-insensitive partial match)
+    matching_shops = []
+    for shop_key, shop_data in SHOPS.items():
+        if category.lower() in shop_data['category'].lower():
+            matching_shops.append(shop_data)
+    
+    if matching_shops:
+        message = f"🏪 *{category}* shops:\n\n"
+        for shop in matching_shops:
+            message += f"• *{shop['name']}*\n  📍 {shop['location']}\n\n"
+        
+        return jsonify({
+            "found": True,
+            "category": category,
+            "count": len(matching_shops),
+            "shops": matching_shops,
+            "message": message
+        }), 200
+    
+    return jsonify({
+        "found": False,
+        "message": f"No shops found in category '{category}'"
+    }), 404
+
+@app.route('/popular', methods=['GET'])
+def get_popular():
+    """Get popular/featured shops"""
+    popular_shops = ["uniqlo", "h&m", "shake shack", "starbucks", "muji", "jollibee"]
+    
+    shops_list = []
+    message = "⭐ *Popular Shops at SM Mall of Asia:*\n\n"
+    
+    for i, shop_key in enumerate(popular_shops, 1):
+        if shop_key in SHOPS:
+            shop = SHOPS[shop_key]
+            shops_list.append(shop)
+            message += f"{i}. *{shop['name']}*\n   📍 {shop['location']}\n   🏷️ {shop['category']}\n\n"
+    
+    return jsonify({
+        "popular": shops_list,
+        "count": len(shops_list),
+        "message": message
+    }), 200
 
 if __name__ == '__main__':
     import os
