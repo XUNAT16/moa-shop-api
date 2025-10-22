@@ -55,6 +55,31 @@ SHOPS = {
         "name": "Power Mac Center",
         "location": "Main Mall, Ground Level – North Wing",
         "category": "Electronics"
+    },
+    "mcdonald's": {
+        "name": "McDonald's",
+        "location": "Main Mall, Ground Level – Food Court Area",
+        "category": "Food & Dining / Fast Food"
+    },
+    "jollibee": {
+        "name": "Jollibee",
+        "location": "Main Mall, Ground Level – near Atrium",
+        "category": "Food & Dining / Fast Food"
+    },
+    "miniso": {
+        "name": "Miniso",
+        "location": "Main Mall, Ground Level – South Wing",
+        "category": "Home & Lifestyle"
+    },
+    "national bookstore": {
+        "name": "National Bookstore",
+        "location": "Main Mall, Ground Level – North Wing",
+        "category": "Books & Stationery"
+    },
+    "timezone": {
+        "name": "Timezone",
+        "location": "Main Mall, Upper Ground Level – Entertainment Area",
+        "category": "Entertainment / Gaming"
     }
 }
 
