@@ -889,6 +889,387 @@ def company_info():
     # No query or category - return complete info
     return jsonify(get_all_info()), 200
 
+# MOA AI Assistant Endpoint - Comprehensive Q&A System
+@app.route('/assistant', methods=['GET', 'POST'])
+@app.route('/ask', methods=['GET', 'POST'])
+@app.route('/ai', methods=['GET', 'POST'])
+def moa_assistant():
+    """
+    Intelligent MOA AI Assistant that can answer questions about:
+    - Store directory, hours, locations
+    - Parking, traffic, transportation
+    - Events, facilities, services
+    - Company history, financials
+    - Restaurant/dining options
+    - And much more!
+    """
+    data = request.get_json(force=True, silent=True) or {}
+    question = data.get('question', data.get('query', data.get('q', ''))).lower().strip()
+    
+    if not question:
+        return jsonify({
+            "found": False,
+            "type": "help",
+            "message": (
+                "👋 *Welcome to MOA AI Assistant!*\n\n"
+                "I can help you with:\n\n"
+                "🛍️ *Shopping*\n"
+                "• Store locations & hours\n"
+                "• Shop directory\n"
+                "• Price ranges\n\n"
+                "🅿️ *Parking & Transport*\n"
+                "• Parking rates & locations\n"
+                "• Traffic tips\n"
+                "• How to get here\n\n"
+                "🍽️ *Dining*\n"
+                "• Restaurants & cuisine\n"
+                "• Price ranges\n"
+                "• Reservations\n\n"
+                "🏢 *About MOA*\n"
+                "• History & facilities\n"
+                "• Events & arena\n"
+                "• Operating hours\n\n"
+                "Just ask me anything!"
+            )
+        }), 200
+    
+    # Keywords for intelligent routing
+    keywords = {
+        # Shopping & Stores
+        'store_hours': ['hours', 'open', 'close', 'operating', 'time'],
+        'store_location': ['where is', 'find', 'location of', 'uniqlo', 'h&m', 'zara', 'nike'],
+        'shopping': ['shop', 'store', 'brand', 'buy', 'purchase'],
+        
+        # Parking & Transportation
+        'parking': ['park', 'parking', 'car'],
+        'parking_rate': ['parking rate', 'parking cost', 'parking price', 'parking fee', 'how much park'],
+        'parking_location': ['where to park', 'parking building', 'parking area'],
+        'transport': ['how to get', 'mrt', 'lrt', 'bus', 'jeep', 'transport', 'commute'],
+        'traffic': ['traffic', 'congestion', 'peak hours', 'rush hour'],
+        
+        # Dining
+        'dining': ['restaurant', 'food', 'eat', 'dine', 'cafe', 'coffee'],
+        'cuisine': ['italian', 'filipino', 'japanese', 'chinese', 'korean', 'buffet'],
+        'price_range': ['price', 'cost', 'expensive', 'cheap', 'budget'],
+        
+        # Events & Entertainment
+        'events': ['event', 'concert', 'show', 'festival', 'fireworks', 'pyromusical'],
+        'arena': ['arena', 'moa arena', 'concert venue'],
+        'smx': ['smx', 'convention', 'conference'],
+        
+        # Facilities & Services
+        'facilities': ['facility', 'restroom', 'cr', 'atm', 'bank', 'clinic', 'wheelchair'],
+        'services': ['service', 'lost and found', 'customer service', 'help desk'],
+        
+        # Company Info
+        'history': ['history', 'when opened', 'founded', 'established'],
+        'ownership': ['owner', 'who owns', 'sm prime', 'developer'],
+        'financials': ['revenue', 'financial', 'stock', 'shares'],
+        
+        # Accessibility
+        'accessibility': ['wheelchair', 'accessible', 'ramp', 'elevator', 'disability'],
+        'safety': ['safe', 'security', 'emergency', 'first aid'],
+    }
+    
+    # Response templates based on question patterns
+    
+    # Operating Hours
+    if any(word in question for word in keywords['store_hours']):
+        return jsonify({
+            "found": True,
+            "type": "hours",
+            "message": (
+                "🕐 *SM Mall of Asia Operating Hours*\n\n"
+                "📅 *Daily:* 10:00 AM - 10:00 PM\n\n"
+                "⏰ *Extended Hours:*\n"
+                "• Restaurants may open until 11:00 PM\n"
+                "• Arena events: varies by schedule\n"
+                "• 24/7: Security & parking\n\n"
+                "💡 *Special Hours:*\n"
+                "Holidays and special events may have different hours. "
+                "Check our events calendar for updates!"
+            )
+        }), 200
+    
+    # Parking Rates
+    elif 'parking' in question and any(word in question for word in ['rate', 'cost', 'price', 'fee', 'how much']):
+        return jsonify({
+            "found": True,
+            "type": "parking_rates",
+            "message": (
+                "🅿️ *MOA Parking Rates*\n\n"
+                "💵 *Standard Rates:*\n"
+                "• First 3 hours: ₱50\n"
+                "• Succeeding hours: ₱20/hour\n"
+                "• Daily max: ₱200\n"
+                "• Overnight: ₱300\n"
+                "• Additional: +₱50 if exiting after 6:01 AM\n\n"
+                "🚗 *Parking Buildings:*\n"
+                "• North Parking (8,000 slots)\n"
+                "• South Parking\n"
+                "• Seaside Parking\n"
+                "• Arena Parking\n\n"
+                "💡 *Tip:* Arrive early during events!"
+            )
+        }), 200
+    
+    # How to Get There / Transportation
+    elif any(word in question for word in keywords['transport']):
+        return jsonify({
+            "found": True,
+            "type": "transport",
+            "message": (
+                "🚇 *How to Get to SM Mall of Asia*\n\n"
+                "🚆 *By MRT/LRT:*\n"
+                "• Take MRT-3 or LRT-1 to Taft Avenue Station\n"
+                "• Take jeepney/UV Express to MOA (~15 min)\n"
+                "• Fare: ₱15-30\n\n"
+                "🚌 *By Bus:*\n"
+                "• EDSA Carousel (free)\n"
+                "• Regular buses via EDSA-Taft\n\n"
+                "🚕 *By Taxi/Grab:*\n"
+                "• From NAIA: 15-25 minutes\n"
+                "• From Makati: 30-45 minutes\n\n"
+                "📍 *Address:*\n"
+                "Seaside Blvd, Pasay City, Metro Manila"
+            )
+        }), 200
+    
+    # Dining / Restaurants
+    elif any(word in question for word in keywords['dining']):
+        if 'vikings' in question:
+            return jsonify({
+                "found": True,
+                "type": "restaurant",
+                "message": (
+                    "🍽️ *Vikings Luxury Buffet*\n\n"
+                    "📍 *Location:* Seaside Boulevard, SM by the Bay\n"
+                    "🍴 *Cuisine:* International Buffet\n"
+                    "💰 *Price:* ₱1,000 - ₱2,500 per person\n"
+                    "⏰ *Hours:*\n"
+                    "• Lunch: 11:00 AM - 2:30 PM\n"
+                    "• Dinner: 5:30 PM - 10:00 PM\n\n"
+                    "📞 *Reservations:* Recommended\n"
+                    "Visit Vikings website for bookings!"
+                )
+            }), 200
+        elif 'manam' in question:
+            return jsonify({
+                "found": True,
+                "type": "restaurant",
+                "message": (
+                    "🍽️ *Manam Comfort Filipino*\n\n"
+                    "📍 *Location:* Main Mall, South Wing Ground Floor\n"
+                    "🍴 *Cuisine:* Filipino Comfort Food\n"
+                    "💰 *Price:* ₱350 - ₱700 per person\n"
+                    "⏰ *Hours:* 10:00 AM - 10:00 PM\n\n"
+                    "🌟 *Popular Dishes:*\n"
+                    "• Sinigang na Corned Beef\n"
+                    "• Sisig\n"
+                    "• Crispy Dinuguan"
+                )
+            }), 200
+        else:
+            return jsonify({
+                "found": True,
+                "type": "dining",
+                "message": (
+                    "🍽️ *MOA Dining Options*\n\n"
+                    "🌟 *Featured Restaurants:*\n\n"
+                    "**Filipino:**\n"
+                    "• Manam (₱350-700)\n"
+                    "• Jollibee (₱80-200)\n\n"
+                    "**International:**\n"
+                    "• Vikings Buffet (₱1,000-2,500)\n"
+                    "• Italianni's (₱600-1,500)\n\n"
+                    "**Casual:**\n"
+                    "• Starbucks Reserve (₱150-450)\n"
+                    "• Various food courts\n\n"
+                    "📍 *Locations:*\n"
+                    "• Main Mall: Ground & 2nd Floor\n"
+                    "• Entertainment Mall\n"
+                    "• Seaside Boulevard\n\n"
+                    "Ask me about a specific restaurant!"
+                )
+            }), 200
+    
+    # Events
+    elif any(word in question for word in keywords['events']):
+        if 'firework' in question or 'pyromusical' in question:
+            return jsonify({
+                "found": True,
+                "type": "events",
+                "message": (
+                    "🎆 *MOA Fireworks Display*\n\n"
+                    "📅 *Schedule:* Every Friday to Sunday\n"
+                    "⏰ *Time:* 7:00 PM\n"
+                    "📍 *Location:* Manila Bay, Seaside Boulevard\n\n"
+                    "🎉 *Philippine International Pyromusical Competition:*\n"
+                    "• Annual event (dates vary)\n"
+                    "• Multiple countries compete\n"
+                    "• Best viewed from Seaside Boulevard\n\n"
+                    "💡 *Tip:* Arrive early for good viewing spots!"
+                )
+            }), 200
+        else:
+            return jsonify({
+                "found": True,
+                "type": "events",
+                "message": (
+                    "🎉 *MOA Events & Entertainment*\n\n"
+                    "🏟️ *MOA Arena:*\n"
+                    "• Capacity: 15,000-20,000\n"
+                    "• Concerts, sports, shows\n"
+                    "• Past artists: BTS, Taylor Swift, Bruno Mars\n\n"
+                    "🎆 *Regular Events:*\n"
+                    "• Fireworks: Fri-Sun @ 7:00 PM\n"
+                    "• Seasonal festivals\n"
+                    "• Holiday celebrations\n\n"
+                    "🏢 *SMX Convention Center:*\n"
+                    "• Exhibitions & trade shows\n"
+                    "• Corporate events\n"
+                    "• Conferences\n\n"
+                    "📞 For event booking: Visit SMX or Arena websites"
+                )
+            }), 200
+    
+    # Facilities & Services
+    elif any(word in question for word in keywords['facilities']):
+        return jsonify({
+            "found": True,
+            "type": "facilities",
+            "message": (
+                "🏢 *MOA Facilities & Services*\n\n"
+                "🚻 *Restrooms:* Each floor, all wings\n"
+                "👶 *Nursing Rooms:* Main Mall Level 2\n"
+                "🙏 *Prayer Rooms:* South Wing 3rd Floor\n"
+                "🏧 *ATMs:* Ground Floor near entrances\n"
+                "🏦 *Banks:* BDO, BPI, Metrobank branches\n"
+                "⚕️ *Medical Clinic:* Ground Floor, Main Mall\n"
+                "♿ *Wheelchair Access:* All entrances\n"
+                "📞 *Customer Service:* (02) 8556-0680\n\n"
+                "🆘 *Emergency Services:*\n"
+                "• First Aid stations\n"
+                "• Security roving 24/7\n"
+                "• Police station in complex"
+            )
+        }), 200
+    
+    # Lost and Found
+    elif 'lost' in question or 'found' in question:
+        return jsonify({
+            "found": True,
+            "type": "service",
+            "message": (
+                "🔍 *Lost & Found*\n\n"
+                "📍 *Location:*\n"
+                "Customer Service / Concierge Desk\n"
+                "Ground Floor, Main Atrium\n\n"
+                "📞 *Contact:*\n"
+                "(02) 8556-0680 local 200\n\n"
+                "🕐 *Hours:* 10:00 AM - 10:00 PM\n\n"
+                "💡 *What to bring:*\n"
+                "• Valid ID\n"
+                "• Description of lost item\n"
+                "• Approximate time/location of loss"
+            )
+        }), 200
+    
+    # History
+    elif any(word in question for word in keywords['history']):
+        return jsonify({
+            "found": True,
+            "type": "history",
+            "message": (
+                "📜 *SM Mall of Asia History*\n\n"
+                "📅 *May 21, 2006:* Grand Opening\n"
+                "• Built on reclaimed land\n"
+                "• 42 hectares, 589,891 m² GFA\n\n"
+                "🏗️ *Major Milestones:*\n"
+                "• 2012: MOA Arena opens\n"
+                "• 2015: APEC Meetings hosted\n"
+                "• 2016: Conrad Manila Hotel\n"
+                "• 2019+: Continuous expansions\n\n"
+                "🏢 *Developer:*\n"
+                "SM Prime Holdings, Inc.\n"
+                "Founded by Henry Sy Sr.\n\n"
+                "🌟 *Notable Events:*\n"
+                "• International concerts\n"
+                "• PBA/NCAA games\n"
+                "• National celebrations"
+            )
+        }), 200
+    
+    # WiFi
+    elif 'wifi' in question or 'internet' in question:
+        return jsonify({
+            "found": True,
+            "type": "service",
+            "message": (
+                "📶 *Free WiFi Available*\n\n"
+                "🌐 *Network:* SM_WiFi\n"
+                "📍 *Coverage:* Mall-wide\n\n"
+                "🔑 *How to Connect:*\n"
+                "1. Select 'SM_WiFi' network\n"
+                "2. Open browser\n"
+                "3. Accept terms & conditions\n"
+                "4. Enter mobile number for OTP\n"
+                "5. You're connected!\n\n"
+                "⏱️ *Session:* 2 hours per connection\n"
+                "🔄 *Re-connect:* Unlimited"
+            )
+        }), 200
+    
+    # Pets
+    elif 'pet' in question or 'dog' in question or 'cat' in question:
+        return jsonify({
+            "found": True,
+            "type": "policy",
+            "message": (
+                "🐾 *Pet Policy*\n\n"
+                "✅ *Pets Welcome!*\n"
+                "Pets are allowed in designated pet-friendly zones.\n\n"
+                "📋 *Requirements:*\n"
+                "• Must be on leash\n"
+                "• Well-behaved\n"
+                "• Owner responsible for cleanup\n\n"
+                "🚫 *Restrictions:*\n"
+                "• Not allowed in food areas\n"
+                "• Not allowed in certain stores\n\n"
+                "💡 Check with security for designated areas!"
+            )
+        }), 200
+    
+    # Default - General Help
+    else:
+        return jsonify({
+            "found": False,
+            "type": "general",
+            "message": (
+                "🤔 I'm not sure about that specific question.\n\n"
+                "I can help you with:\n\n"
+                "🛍️ *Shopping*\n"
+                "• Store locations & hours\n"
+                "• Brands & directory\n\n"
+                "🅿️ *Parking & Transport*\n"
+                "• Rates & locations\n"
+                "• How to get here\n\n"
+                "🍽️ *Dining*\n"
+                "• Restaurants & prices\n"
+                "• Cuisine types\n\n"
+                "🎉 *Events*\n"
+                "• Fireworks, concerts\n"
+                "• Arena schedule\n\n"
+                "🏢 *Services*\n"
+                "• Lost & found\n"
+                "• Customer service\n"
+                "• WiFi, ATMs, facilities\n\n"
+                "📞 *For urgent matters:*\n"
+                "Call (02) 8556-0680\n\n"
+                "Try asking your question differently!"
+            )
+        }), 200
+
 if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
