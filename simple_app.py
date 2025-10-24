@@ -1,8 +1,49 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import threading
+import time
+import requests
+import os
 
 app = Flask(__name__)
 CORS(app)
+
+def self_ping():
+    """
+    Self-ping background task to keep Render Free app awake.
+    
+    Render Free tier apps spin down after 15 minutes of inactivity.
+    This function runs in a background thread and sends an HTTP GET request
+    to the app's own URL every 10 minutes, simulating periodic traffic
+    to prevent the app from going to sleep.
+    
+    The URL is read from the RENDER_EXTERNAL_URL environment variable.
+    If the variable is not set, the task will not run (for local development).
+    """
+    render_url = os.getenv('RENDER_EXTERNAL_URL')
+    
+    if not render_url:
+        print("ℹ️  RENDER_EXTERNAL_URL not set - self-ping disabled (local mode)")
+        return
+    
+    # Remove trailing slash if present
+    render_url = render_url.rstrip('/')
+    ping_url = f"{render_url}/"
+    
+    print(f"✅ Self-ping enabled: Will ping {ping_url} every 10 minutes")
+    
+    while True:
+        try:
+            time.sleep(600)  # Wait 10 minutes (600 seconds)
+            response = requests.get(ping_url, timeout=30)
+            print(f"🏓 Self-ping: {response.status_code} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
+        except Exception as e:
+            print(f"⚠️  Self-ping failed: {e}")
+            # Continue anyway - don't crash the thread
+
+# Start self-ping in background thread
+ping_thread = threading.Thread(target=self_ping, daemon=True)
+ping_thread.start()
 
 # SM Mall of Asia Shop Directory
 SHOPS = {
