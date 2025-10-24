@@ -32,9 +32,17 @@ def self_ping():
     
     print(f"✅ Self-ping enabled: Will ping {ping_url} every 10 minutes")
     
+    # First ping happens immediately (after 1 minute warmup)
+    first_ping = True
+    
     while True:
         try:
-            time.sleep(600)  # Wait 10 minutes (600 seconds)
+            if first_ping:
+                time.sleep(60)  # First ping after just 1 minute
+                first_ping = False
+            else:
+                time.sleep(600)  # Subsequent pings every 10 minutes (600 seconds)
+            
             response = requests.get(ping_url, timeout=30)
             print(f"🏓 Self-ping: {response.status_code} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
         except Exception as e:
