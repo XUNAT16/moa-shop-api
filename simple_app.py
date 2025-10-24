@@ -669,6 +669,226 @@ def traffic_info():
     else:
         return jsonify(get_help_message()), 200
 
+# Company Info / About MOA Endpoint
+@app.route('/company', methods=['GET', 'POST'])
+@app.route('/about', methods=['GET', 'POST'])
+@app.route('/info', methods=['GET', 'POST'])
+def company_info():
+    """Provide comprehensive information about SM Mall of Asia"""
+    
+    # Parse query if provided for specific info categories
+    data = request.get_json(force=True, silent=True) or {}
+    query = data.get('query', '').lower().strip()
+    category = data.get('category', '').lower().strip()
+    
+    # Company info categories
+    def get_overview():
+        return {
+            "found": True,
+            "type": "overview",
+            "message": (
+                "🏢 *SM Mall of Asia (MOA)*\n\n"
+                "SM Mall of Asia is SM Prime Holdings' flagship integrated retail and entertainment complex "
+                "located on reclaimed land along Manila Bay in Pasay City.\n\n"
+                "📅 *Opened:* May 21, 2006\n"
+                "🏗️ *Developer:* SM Prime Holdings, Inc. (SMPH)\n"
+                "📐 *Estate Size:* ~60 hectares\n"
+                "🏬 *Mall GFA:* 386,224 m²\n"
+                "📍 *Location:* Pasay City, Manila Bay\n\n"
+                "MOA is one of the Philippines' largest retail and entertainment destinations, "
+                "functioning as a mixed-use hub featuring retail, arenas, convention center, offices, hotels, and event grounds."
+            )
+        }
+    
+    def get_facilities():
+        return {
+            "found": True,
+            "type": "facilities",
+            "message": (
+                "🏟️ *MOA Complex Major Facilities:*\n\n"
+                "1️⃣ *MOA Arena*\n"
+                "   • Multipurpose indoor arena\n"
+                "   • Capacity: ~15,000 seated (up to 20,000 for concerts)\n"
+                "   • Hosts concerts, sports, large events\n\n"
+                "2️⃣ *Ice Skating Rink*\n"
+                "   • Olympic-sized rink (~1,800 m²)\n"
+                "   • Opened/relocated in 2017\n"
+                "   • Hosts national/international competitions\n\n"
+                "3️⃣ *SMX Convention Center*\n"
+                "   • Convention & exhibition complex\n"
+                "   • Trade shows, corporate events\n\n"
+                "4️⃣ *MOA Concert Grounds / Event Grounds*\n"
+                "   • Large open grounds for concerts & festivals\n"
+                "   • Serves as parking when no events\n\n"
+                "5️⃣ *IKEA Philippines*\n"
+                "   • ~65,000 m² GFA (announced 2018)\n"
+                "   • Major international anchor tenant"
+            )
+        }
+    
+    def get_statistics():
+        return {
+            "found": True,
+            "type": "statistics",
+            "message": (
+                "📊 *SM Mall of Asia - Key Statistics*\n\n"
+                "📅 *Opening Date:* May 21, 2006\n\n"
+                "📐 *Size & Capacity:*\n"
+                "• Estate Size: ~60 hectares\n"
+                "• Mall GFA: 386,224 m²\n"
+                "• Lot Area: 142,146 m²\n"
+                "• Arena Capacity: 15,000-20,000\n\n"
+                "👥 *Q1 2025 Foot Traffic:*\n"
+                "• 34.5 million visits\n"
+                "• ~15% increase YoY\n"
+                "• Driven by strong event lineup\n\n"
+                "🅿️ *Parking:*\n"
+                "• ~10,720 total parking slots\n"
+                "• Multiple parking buildings\n"
+                "• MAAX Arena parking annex"
+            )
+        }
+    
+    def get_history():
+        return {
+            "found": True,
+            "type": "history",
+            "message": (
+                "📜 *SM Mall of Asia - History & Development*\n\n"
+                "🏗️ *Development Timeline:*\n\n"
+                "📅 *2006* - Grand Opening (May 21)\n"
+                "   • Main mall complex opened\n"
+                "   • Built on reclaimed land along Manila Bay\n\n"
+                "📅 *2012* - MOA Arena Opens\n"
+                "   • 15,000+ capacity indoor arena\n"
+                "   • Major events & concert venue\n\n"
+                "📅 *2017* - Ice Rink Relocated\n"
+                "   • Olympic-sized skating rink\n"
+                "   • Competition-ready facility\n\n"
+                "📅 *2018* - IKEA Announced\n"
+                "   • 65,000 m² flagship store\n"
+                "   • Major international expansion\n\n"
+                "🏢 *Strategic Role:*\n"
+                "SM Prime's flagship integrated estate and strategic "
+                "'experience-led' asset, driving retail, events, and tourism in Metro Manila."
+            )
+        }
+    
+    def get_ownership():
+        return {
+            "found": True,
+            "type": "ownership",
+            "message": (
+                "🏢 *Ownership & Management*\n\n"
+                "👔 *Owner/Developer:*\n"
+                "SM Prime Holdings, Inc. (SMPH)\n\n"
+                "📍 *About SM Prime:*\n"
+                "• One of Southeast Asia's largest integrated property developers\n"
+                "• Publicly listed company\n"
+                "• Portfolio includes malls, residences, hotels, convention centers\n\n"
+                "⭐ *Strategic Position:*\n"
+                "• MOA is SM Prime's flagship integrated estate\n"
+                "• Described as strategic 'experience-led' asset\n"
+                "• Major revenue and foot-traffic driver\n"
+                "• Core property in integrated-estate strategy\n\n"
+                "💼 *Economic Role:*\n"
+                "• Generates retail rental income\n"
+                "• Event/arena revenues\n"
+                "• Supports tourism & entertainment\n"
+                "• Major economic engine for SM Prime"
+            )
+        }
+    
+    def get_events():
+        return {
+            "found": True,
+            "type": "events",
+            "message": (
+                "🎉 *MOA Events & Cultural Role*\n\n"
+                "🎭 *Major Events Hosted:*\n"
+                "• Large concerts & music festivals\n"
+                "• Philippine International Pyromusical Competition\n"
+                "• Sporting events (SEA Games events)\n"
+                "• Trade shows & exhibitions\n"
+                "• Corporate events & conventions\n\n"
+                "🎯 *Event Impact:*\n"
+                "• Primary Manila venue for large concerts\n"
+                "• Major foot traffic driver\n"
+                "• City-level cultural significance\n"
+                "• Events magnet (not just retail destination)\n\n"
+                "📈 *Q1 2025 Performance:*\n"
+                "• 34.5 million visits\n"
+                "• ~15% increase attributed to events\n"
+                "• Strong concert & festival lineup\n\n"
+                "🏟️ *Venues:*\n"
+                "• MOA Arena (15,000-20,000 capacity)\n"
+                "• Concert Grounds / MOA Square\n"
+                "• SMX Convention Center"
+            )
+        }
+    
+    def get_all_info():
+        return {
+            "found": True,
+            "type": "complete",
+            "message": (
+                "🏢 *SM MALL OF ASIA - Complete Information*\n\n"
+                "📍 *Location:* Pasay City, Manila Bay\n"
+                "📅 *Opened:* May 21, 2006\n"
+                "🏗️ *Developer:* SM Prime Holdings, Inc.\n\n"
+                "📊 *Size & Capacity:*\n"
+                "• Estate: ~60 hectares\n"
+                "• Mall GFA: 386,224 m²\n"
+                "• Q1 2025: 34.5M visits\n\n"
+                "🏟️ *Major Facilities:*\n"
+                "• MOA Arena (15-20K capacity)\n"
+                "• Olympic Ice Rink\n"
+                "• SMX Convention Center\n"
+                "• Concert Grounds\n"
+                "• IKEA (65,000 m²)\n\n"
+                "🎯 *Strategic Role:*\n"
+                "SM Prime's flagship integrated estate - retail, entertainment, events, tourism hub\n\n"
+                "💡 Ask about: overview, facilities, statistics, history, ownership, or events"
+            )
+        }
+    
+    # Category-based routing
+    if category:
+        if category == 'overview':
+            return jsonify(get_overview()), 200
+        elif category == 'facilities':
+            return jsonify(get_facilities()), 200
+        elif category == 'statistics' or category == 'stats':
+            return jsonify(get_statistics()), 200
+        elif category == 'history':
+            return jsonify(get_history()), 200
+        elif category == 'ownership' or category == 'management':
+            return jsonify(get_ownership()), 200
+        elif category == 'events':
+            return jsonify(get_events()), 200
+        else:
+            return jsonify(get_all_info()), 200
+    
+    # Query-based routing
+    if query:
+        if any(word in query for word in ['overview', 'about', 'what is', 'summary']):
+            return jsonify(get_overview()), 200
+        elif any(word in query for word in ['facility', 'facilities', 'venue', 'arena', 'ikea', 'rink']):
+            return jsonify(get_facilities()), 200
+        elif any(word in query for word in ['statistic', 'stats', 'number', 'size', 'capacity', 'traffic', 'visit']):
+            return jsonify(get_statistics()), 200
+        elif any(word in query for word in ['history', 'when', 'opened', 'built', 'timeline']):
+            return jsonify(get_history()), 200
+        elif any(word in query for word in ['owner', 'ownership', 'sm prime', 'developer', 'company', 'management']):
+            return jsonify(get_ownership()), 200
+        elif any(word in query for word in ['event', 'concert', 'show', 'festival', 'pyromusical']):
+            return jsonify(get_events()), 200
+        else:
+            return jsonify(get_all_info()), 200
+    
+    # No query or category - return complete info
+    return jsonify(get_all_info()), 200
+
 if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
